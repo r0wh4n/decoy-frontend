@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- REPLACE title + description with the user's product -->
+<title>Demo</title>
+<meta name="description" content="A styled demo landing page." />
+
+<!-- REPLACE fonts with the closest free Google Fonts to the reference -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital@0;1&display=swap" rel="stylesheet" />
+
+<style>
+/* ===== DESIGN TOKENS — retune the whole look from here ===================== */
+:root{
+  --bg:#0b0b0d; --ink:#f4f4f5; --muted:#a1a1aa; --accent:#7c5cff;
+  --line:color-mix(in srgb, var(--ink) 12%, transparent);
+  --f-display:"Newsreader",Georgia,serif;
+  --f-body:"Inter",system-ui,sans-serif;
+  --step-hero:clamp(2.6rem,7vw,5.5rem); --step-h2:clamp(1.8rem,4vw,3rem);
+  --radius:14px; --shadow:0 20px 60px -20px rgba(0,0,0,.55);
+  --maxw:1120px; --gutter:clamp(20px,5vw,64px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{line-height:1.05;margin:0;font-weight:600}
+.inner{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+.section{padding:clamp(80px,12vh,180px) 0;position:relative}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+.lead{color:var(--muted);font-size:clamp(1.05rem,1.4vw,1.3rem);max-width:44ch}
+.hero h1{font-family:var(--f-display);font-size:var(--step-hero);letter-spacing:-.02em}
+.h2{font-family:var(--f-display);font-size:var(--step-h2);letter-spacing:-.01em}
+.grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:2.5rem}
+.card{border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow)}
+.blob{position:absolute;width:46vw;height:46vw;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,var(--accent),transparent 70%);
+  filter:blur(40px);opacity:.35;pointer-events:none;z-index:0}
+/* reveal + motion hooks */
+.rise{opacity:0;transform:translateY(24px)}
+.rw-mask{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em;margin-bottom:-.14em}
+.rw-word{display:inline-block;will-change:transform}
+.rw-word.it{font-style:italic;color:var(--accent)}
+.progress{position:fixed;top:0;left:0;height:3px;width:100%;background:var(--accent);
+  transform:scaleX(0);transform-origin:0 50%;z-index:100}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rise{opacity:1;transform:none}
+  .rw-word{transform:none!important}
+}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden></div>
+
+<!-- REPLACE all content below with the product's story in the reference's style -->
+<section class="section hero">
+  <div class="blob" data-speed="80" style="top:-10vw;right:-8vw"></div>
+  <div class="inner" style="position:relative;z-index:1">
+    <p class="eyebrow">Replace · eyebrow</p>
+    <h1 class="reveal" data-accent="borrows">A headline that borrows the reference</h1>
+    <p class="lead rise" style="margin-top:1.5rem">Replace this with the product&rsquo;s real value proposition, in the reference&rsquo;s tone.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="inner">
+    <h2 class="h2 reveal">A section that reveals on scroll</h2>
+    <div class="grid rise">
+      <div class="card"><h3 class="h2" style="font-size:1.3rem">One</h3><p class="lead" style="font-size:1rem;margin-top:.5rem">Replace with a real feature.</p></div>
+      <div class="card"><h3 class="h2" style="font-size:1.3rem">Two</h3><p class="lead" style="font-size:1rem;margin-top:.5rem">Cards rise in via <code>.rise</code>.</p></div>
+      <div class="card"><h3 class="h2" style="font-size:1.3rem">Three</h3><p class="lead" style="font-size:1rem;margin-top:.5rem">Replace with a real feature.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="text-align:center">
+  <div class="inner"><h2 class="h2 reveal" data-accent="action">Closing call to action</h2></div>
+</section>
+
+<!-- Pinned exact versions. gsap/ScrollTrigger from cdnjs, lenis from jsdelivr -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // progress bar (always on; cheap)
+  const bar = document.querySelector(".progress");
+  const tick = () => {
+    const h = document.documentElement, max = h.scrollHeight - h.clientHeight;
+    bar.style.transform = `scaleX(${max > 0 ? h.scrollTop / max : 0})`;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+
+  // word-mask split for every .reveal heading (so it can animate per word)
+  document.querySelectorAll(".reveal").forEach((el) => {
+    const accent = (el.dataset.accent || "").toLowerCase().split(/\s+/).filter(Boolean);
+    const words = el.textContent.trim().split(" ");
+    el.textContent = "";
+    words.forEach((w, i) => {
+      const mask = document.createElement("span"); mask.className = "rw-mask";
+      const word = document.createElement("span");
+      word.className = "rw-word" + (accent.includes(w.replace(/[.,]/g, "").toLowerCase()) ? " it" : "");
+      word.textContent = w; mask.appendChild(word);
+      el.appendChild(mask);
+      if (i < words.length - 1) el.appendChild(document.createTextNode(" "));
+    });
+  });
+
+  if (reduce) return; // static, accessible fallback
+
+  gsap.registerPlugin(ScrollTrigger);
+  const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  gsap.utils.toArray(".rise").forEach((el) =>
+    gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+      scrollTrigger: { trigger: el, start: "top 90%" } }));
+
+  gsap.utils.toArray("[data-speed]").forEach((el) => {
+    const s = parseFloat(el.dataset.speed || "0");
+    gsap.fromTo(el, { y: s }, { y: -s, ease: "none",
+      scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
+  });
+
+  gsap.utils.toArray(".reveal").forEach((el) =>
+    gsap.from(el.querySelectorAll(".rw-word"), { yPercent: 115, duration: 0.8,
+      ease: "power3.out", stagger: 0.06, scrollTrigger: { trigger: el, start: "top 82%" } }));
+
+  setTimeout(() => ScrollTrigger.refresh(), 300);
+})();
+</script>
+</body>
+</html>
